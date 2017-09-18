@@ -1,0 +1,17 @@
+[Unit]
+Description=nginx load balancer Configure
+Requires=consul.service
+After=consul.service nginx.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/consul kv import @/etc/chip-in/kvs.json
+ExecStart=/usr/bin/consul-template '-template=/usr/lib/chip-in/chip-in-config.sh.tmpl:/var/run/chip-in-config.sh:/bin/bash /var/run/chip-in-config.sh'
+ExecReload=/usr/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=30s
+KillSignal=INT
+SuccessExitStatus=12
+
+[Install]
+WantedBy=webgate.target

@@ -1,0 +1,21 @@
+sudo: required
+language: ruby
+services:
+  - docker
+install: true
+script:
+  - docker build -t chipin/configure-rpm .
+  - mkdir -p /tmp/RPMS/x86_64
+  - sudo chown 111:111 -R /tmp/RPMS
+  - docker run -it --rm --name configure-rpm -v /tmp/RPMS:/home/builder/rpmbuild/RPMS chipin/configure-rpm
+  - (cd /tmp;tar -czf - RPMS) > $TRAVIS_BUILD_DIR/configure-rpm.tar.gz
+deploy:
+  provider: releases
+  api_key:
+    secure: arzYF9uqcVY0JsQ6MPw2CYLVtlkOIeY0Pn9tYAR9BJc4zmIhK0xR3we1fvErB9pYG59sptMdn6aJchi/ZYEWzoGBs6joWOayEd9gbTjhUfVQCYpGMpuGSsB1FF7gNepGbenI3189+Kb6xNSnKewt14ma6FpDqhbOMhqMoctaNw2xd5iWdWLqHO5nMyCDpVEOSyk09Flie/jK+9krX22qYhAejj5oeuYQKeD4tCLnmOR38ItWqYT3cHHEFBMgp6nVW2qiDROOEwgC4h2zBjCr4qt84T51GXhSLm3euYKv6idVlaRADEej7QYjB+ykR76q7Qic5ViYYBjmtgzBcYnrQ8cZb/c88XKY76QLUocTeypsNgDv/7+ntckITM7JFaekeU4hvC2UdlGQMjkdDv4xWMPx8AY30oVpelnDQ3KNteUm0WVEr4c7ck9uP6Rl69GD06jYqrtdTsxya+ZoChluBf7wzKlT2Ux5oWHnp7co2u5KPFJVxdCA/o8kCAasuoXixDRK/MzbOPVDfPL9PARY7kJpx0Fd27utPJwvbEqiGyzzvMYLvt32QybpbwSZlVezGaFB4ciee/wp4FC7R5AmeMrtRpDzIYpnougyV8OKVyNJW5bfx4YDTQurdB02r8JhCyVACFKWfRTVUi6t82in3iAVmsPrQEcYv7Wn1Ly2/rI=
+  file: configure-rpm.tar.gz
+  overwrite: true
+  skip_cleanup: true
+  on:
+    repo: chip-in/configure
+    tags: true
