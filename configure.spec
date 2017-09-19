@@ -9,6 +9,7 @@ Source0: configure
 License:	MIT
 Requires:	nodejs
 Requires:	npm
+Requires:	nginx
 
 %description
 
