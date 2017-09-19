@@ -29,6 +29,7 @@ function upload() {
   local workfile=$WORKDIR/$(basename $target)
   /usr/bin/cat > $workfile
   if ! /usr/bin/cmp -s $target $workfile; then
+    mkdir -p $(basename $target)
     /usr/bin/mv $workfile $target
     if [ $service == nginx ]; then
       NEED_RELOAD_NGINX=true
