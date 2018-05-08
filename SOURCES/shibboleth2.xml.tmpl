@@ -1,0 +1,42 @@
+<SPConfig xmlns="urn:mace:shibboleth:2.0:native:sp:config" xmlns:conf="urn:mace:shibboleth:2.0:native:sp:config"
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+    xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:am="urn:mace:shibboleth:2.0:attribute-map"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" clockSkew="180">
+    <RequestMapper type="XML">
+      <RequestMap applicationId="default">
+        <Host name="{{ env JWT_ISSUER_FQDN }" applicationId="default"
+                authType="shibboleth"
+                requireSession="true">
+        </Host>
+      </RequestMap>
+    </RequestMapper>
+    <ApplicationDefaults entityID="https://{{ env JWT_ISSUER_FQDN }}/Shibboleth.sso/Metadata" REMOTE_USER="UID">
+        <Errors supportContact="root@{{ env JWT_ISSUER_FQDN }" helpLocation="/about.html"
+            styleSheet="/shibboleth-sp/main.css"/>
+{{- range ls "metadatas" }}{{$metadata := .Value | parseJSON}}
+  {{- if $metadata.url}}
+        <MetadataProvider type="XML" validate="false" url="{{$metadata.url}}" backingFilePath="metadata/{{.Key}}.xml" />
+  {{- else}}
+        <MetadataProvider type="XML" validate="false" file="metadata/{{.Key}}.xml" />
+  {{- end}}
+{{- end}}
+        <AttributeExtractor type="XML" validate="true" >
+          <am:Attributes>
+            <am:Attribute name="UID" id="UID">
+              <am:AttributeDecoder xsi:type="am:NameIDAttributeDecoder" formatter="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
+            </am:Attribute>
+          </am:Attributes>
+        </AttributeExtractor>
+        <AttributeResolver type="Query" subjectMatch="true"/>
+        <Sessions lifetime="28800" timeout="3600" relayState="ss:mem" checkAddress="true" handlerSSL="true" cookieProps="https">
+            <SSO entityID="${IDP_ENTITY_ID}">
+              SAML2 SAML1
+            </SSO>
+            <Logout>SAML2 Local</Logout>
+        </Sessions>
+        <CredentialResolver type="File" key="/etc/shibboleth/sp-key.pem" certificate="/etc/shibboleth/sp-cert.pem"/>
+    </ApplicationDefaults>
+    <SecurityPolicyProvider type="XML" validate="true" path="security-policy.xml"/>
+    <ProtocolProvider type="XML" validate="true" reloadChanges="false" path="protocols.xml"/>
+</SPConfig>
+_

@@ -1,0 +1,18 @@
+[Unit]
+Description=JWT Verifire Configure
+Requires=consul.service
+After=consul.service nginx.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/consul-template \
+  '-template=/usr/lib/chip-in/jwtVerifire.json.tmpl:/etc/nginx/chip-in-settings/jwtVerifire.json:systemctl reload nginx' \
+  '-template=/usr/lib/chip-in/jwtVerifire.conf.tmpl:/etc/nginx/conf.d/auth.conf.proxy:systemctl reload nginx'
+ExecReload=/usr/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=30s
+KillSignal=INT
+SuccessExitStatus=12
+
+[Install]
+WantedBy=multi-user.target

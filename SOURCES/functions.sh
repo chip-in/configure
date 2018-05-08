@@ -20,7 +20,7 @@ function reloadNginx() {
 
 function reloadShibboleth() {
   message "Trigger restart shibboleth."
-  systemctl estart shibd shibfcgi
+  systemctl restart shibd shibfcgi
 }
 
 function upload() {

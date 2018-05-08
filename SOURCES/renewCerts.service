@@ -1,0 +1,6 @@
+[Unit]
+Description=Renew Certificates from lets encrypt
+
+[Service]
+Type=oneshot
+ExecStart=/bin/certbot renew

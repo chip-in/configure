@@ -1,0 +1,18 @@
+[Unit]
+Description=JWT Issuer Configure
+Requires=consul.service
+After=consul.service nginx.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/env2htpsswd.sh
+ExecStart=/usr/bin/consul-template \
+  '-template=/usr/lib/chip-in/jwtIssuer.conf.tmpl:/etc/nginx/conf.d/jwtIssuer.conf:systemctl reload nginx'
+ExecReload=/usr/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=30s
+KillSignal=INT
+SuccessExitStatus=12
+
+[Install]
+WantedBy=multi-user.target

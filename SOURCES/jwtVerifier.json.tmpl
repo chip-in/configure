@@ -1,0 +1,29 @@
+{
+{{- if key exists "jwt" }}
+  "fqdn": "{{ env "CORE_FQDN" }}",
+  "type": "verify",
+  "decode": {
+      "key": "{{ key jwt | parseJSON | .sharedKey }}"
+  },
+  "receive": {
+    "byCookie": {
+      name": "access_token"
+    },
+    "byQuery": {
+      "name":"access_token"
+    }
+  },
+  "onDeny": {
+  {{- if env "JWT_ISSUER_FQDN" }}
+    "code": "302",
+    "redirect": {
+      "uri": "https://{{ env "JWT_ISSUER_FQDN" }}/JWTIssuer",
+      "param_name": "redirect_uri"
+    }
+  {{- else }}
+    "code": "401",
+    "template": "deny.template.html"
+  {{- end }}
+  }
+{{- end }}
+}
