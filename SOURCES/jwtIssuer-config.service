@@ -5,7 +5,8 @@ After=consul.service nginx.service
 
 [Service]
 Type=simple
-ExecStartPre=/usr/bin/env2htpsswd.sh
+EnvironmentFile=/var/run/SYSTEMD_ENV
+ExecStartPre=/usr/bin/env2htpasswd.sh
 ExecStart=/usr/bin/consul-template \
   '-template=/usr/lib/chip-in/jwtIssuer.conf.tmpl:/etc/nginx/conf.d/jwtIssuer.conf:systemctl reload nginx'
 ExecReload=/usr/bin/kill -s HUP $MAINPID

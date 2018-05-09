@@ -1,13 +1,14 @@
 [Unit]
-Description=JWT Verifire Configure
+Description=JWT Verifier Configure
 Requires=consul.service
 After=consul.service nginx.service
 
 [Service]
 Type=simple
+EnvironmentFile=/var/run/SYSTEMD_ENV
 ExecStart=/usr/bin/consul-template \
-  '-template=/usr/lib/chip-in/jwtVerifire.json.tmpl:/etc/nginx/chip-in-settings/jwtVerifire.json:systemctl reload nginx' \
-  '-template=/usr/lib/chip-in/jwtVerifire.conf.tmpl:/etc/nginx/conf.d/auth.conf.proxy:systemctl reload nginx'
+  '-template=/usr/lib/chip-in/jwtVerifier.json.tmpl:/etc/nginx/chip-in-settings/jwtVerifier.json:systemctl reload nginx' \
+  '-template=/usr/lib/chip-in/jwtVerifier.conf.tmpl:/etc/nginx/conf.d/auth.conf.proxy:systemctl reload nginx'
 ExecReload=/usr/bin/kill -s HUP $MAINPID
 Restart=on-failure
 RestartSec=30s

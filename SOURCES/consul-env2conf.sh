@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Import our environment variables from systemd
+tr "\000" "\n" < /proc/1/environ > /var/run/SYSTEMD_ENV
+
+. /var/run/SYSTEMD_ENV
+
 BOOTSTRAP_EXPECT=1
 RETRY_JOIN=
 if [ -n "$PEERS" ]; then
@@ -11,7 +16,7 @@ if [ -n "$CONSUL_SHARED_KEY" ]; then
   ENCRYPT="encrypt: [$CONSUL_SHARED_KEY],"
 fi
 
-cat > /etc/consul.conf << __EOF
+cat > /etc/consul.json << __EOF
 {
   "data_dir" : "/var/consul",
   "log_level": "INFO",

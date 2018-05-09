@@ -14,6 +14,8 @@ function load () {
   base64 -d  << __EOF | upload /etc/shibboleth/metadata/{{ .Key }}.xml shibboleth
 {{ base64Encode $metadata.metadata }}
 __EOF
+  {{- end }}
+{{- end }}
   reloadShibboleth
 }
 

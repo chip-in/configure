@@ -1,6 +1,6 @@
 %define		debug_package %{nil}
 Name: chip-in-configure
-Version: 1.0.0
+Version: 1.0.1
 Release: %{CHIP_IN_REVISION}%{?dist}
 Group: Applications/System
 Summary: Auto configuration tool for chip-in core node system
@@ -42,6 +42,7 @@ install jwtIssuer.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install jwtVerifier-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install jwtVerifier.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install jwtVerifier.json.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install load-certificates.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install load-certificates.sh $RPM_BUILD_ROOT/usr/bin
 install metadata-download.sh.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install renewCerts.service $RPM_BUILD_ROOT/usr/lib/systemd/system
@@ -51,9 +52,7 @@ install shibboleth2.xml.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 
 %files
 %defattr(644,root,root,755)
-%attr(755,root,root) /usr/bin/consul
-%attr(755,root,root) /usr/bin/consul-template
-/usr/bin/*
+%attr(755,root,root) /usr/bin/*
 /usr/lib/systemd/system/*
 /usr/lib/chip-in
 /etc/consul.d
@@ -63,8 +62,6 @@ install shibboleth2.xml.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 %post
 if [ "$1" = "1" ]; then
   cp -p /usr/lib/chip-in/default.conf /etc/nginx/conf.d/default.conf
-  systemctl daemon-reload
-  systemctl enable consul.service jwtIssuer-config.service jwtVerifier-config.service renewCerts.timer shibboleth-config.service
 fi
 
 %changelog

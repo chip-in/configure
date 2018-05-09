@@ -6,7 +6,7 @@ server {
   client_max_body_size 20m;
   include /etc/nginx/conf.d/*.conf.server;
   location /JWTIssuer {
-  {{- if key exists "saml" }}
+  {{- if keyExists "saml" }}
     shib_request /shibauthorizer;
     shib_request_use_headers on;
     include shib_clear_headers;
@@ -17,7 +17,7 @@ server {
     set $issuerconf "jwtIssuer.json";
     content_by_lua_file lua/jwtIssue.lua;
   }
-  {{- if key exists "saml" }}
+  {{- if keyExists "saml" }}
   # FastCGI authorizer for Shibboleth Auth Request module
   location = /shibauthorizer {
       internal;

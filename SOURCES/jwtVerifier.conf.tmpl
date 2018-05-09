@@ -1,5 +1,5 @@
-{{- if key exists "jwt" }}
-set $verifyconf "jwtVerifire.json";
+{{- if keyExists "jwt" }}
+set $verifyconf "jwtVerifier.json";
 access_by_lua_file lua/jwtVerify.lua;
 set $nswg_jwt_sub "";
 log_by_lua_file lua/jwtVerifiedLogging.lua;

@@ -1,0 +1,13 @@
+[Unit]
+Description=Load certificates
+Requires=network-online.target
+Requires=consul.service
+After=consul.service nginx.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/var/run/SYSTEMD_ENV
+ExecStart=/usr/bin/load-certificates.sh
+
+[Install]
+WantedBy=multi-user.target

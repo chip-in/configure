@@ -1,9 +1,9 @@
 {
-{{- if key exists "jwt" }}
+{{- if keyExists "jwt" }}
   "fqdn": "{{ env "CORE_FQDN" }}",
   "type": "verify",
   "decode": {
-      "key": "{{ key jwt | parseJSON | .sharedKey }}"
+      "key": "{{ key "jwt" | parseJSON | .sharedKey }}"
   },
   "receive": {
     "byCookie": {
