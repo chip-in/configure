@@ -1,0 +1,39 @@
+{
+{{- if keyExists "jwt" }}
+  {{ jwt := key "jwt" | parseJSON }}
+  "fqdn": "{{ env "JWT_ISSUER_FQDN" }}",
+  "type": "issue",
+  "encode": {
+    "alg": "HS256",
+    "expSec": "{{ jwt.expSec }}"
+    "key": "{{ jwt.sharedKey }}"
+  },
+  "subject":
+  {
+    "from":"variable",
+    "var_name":"remote_user"
+  },
+  "privateClaim":
+  {
+    "copyFromHeader": {{ jwt.attrs | toJSON }}
+  },
+  "onSuccess":
+  {
+    "set_cookie":
+    {
+      "name":"access_token",
+      "opts":"Path=/;Secure"
+    },
+    "redirect":
+    {
+      "uriPattern": {{ jwt.uriPattern | toJSON }},
+      "param_name":"access_token"
+    }
+  },
+  "onError":
+  {
+    "code":"400",
+    "template":"error.template.json"
+  }
+{{- end }}
+}
