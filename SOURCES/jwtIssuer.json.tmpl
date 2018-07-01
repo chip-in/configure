@@ -1,12 +1,12 @@
 {
 {{- if keyExists "jwt" }}
-  {{ jwt := key "jwt" | parseJSON }}
+  {{$jwt := key "jwt" | parseJSON }}
   "fqdn": "{{ env "JWT_ISSUER_FQDN" }}",
   "type": "issue",
   "encode": {
     "alg": "HS256",
-    "expSec": "{{ jwt.expSec }}"
-    "key": "{{ jwt.sharedKey }}"
+    "expSec": "{{ $jwt.expSec }}",
+    "key": "{{ $jwt.sharedKey }}"
   },
   "subject":
   {
@@ -15,7 +15,7 @@
   },
   "privateClaim":
   {
-    "copyFromHeader": {{ jwt.attrs | toJSON }}
+    "copyFromHeader": {{ toJSON  $jwt.attrs}}
   },
   "onSuccess":
   {
@@ -26,7 +26,7 @@
     },
     "redirect":
     {
-      "uriPattern": {{ jwt.uriPattern | toJSON }},
+      "uriPattern": {{ toJSON $jwt.uriPattern }},
       "param_name":"access_token"
     }
   },

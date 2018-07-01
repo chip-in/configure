@@ -1,6 +1,14 @@
 {{- if keyExists "jwt" }}
+  {{- scratch.Set "secure" ""}}
+  {{- if env "CERTIFICATE_MODE" }}
+    {{- scratch.Set "secure" "Secure;"}}
+  {{- end }}
 set $verifyconf "jwtVerifier.json";
 access_by_lua_file lua/jwtVerify.lua;
+set $query_token "";
+if ( $query_string ~ "(^|&)access_token=([^&]*)(&|$)") {
+  add_header Set-Cookie "access_token=$2;Path=/;{{- scratch.Get "secure" }}";
+}
 set $nswg_jwt_sub "";
 log_by_lua_file lua/jwtVerifiedLogging.lua;
 {{- end }}

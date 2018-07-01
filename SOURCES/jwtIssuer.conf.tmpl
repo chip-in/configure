@@ -35,10 +35,6 @@ server {
       alias /usr/share/shibboleth/;
   }
   {{- end }}
-  location /WebGate.jwt.setting {
-    internal;
-    root /etc/nginx;
-  }
   location / {
       index  index.html index.htm;
   }

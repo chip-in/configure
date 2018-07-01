@@ -51,6 +51,7 @@ install renewCerts.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install renewCerts.timer $RPM_BUILD_ROOT/usr/lib/systemd/system
 install shibboleth-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install shibboleth2.xml.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install setting.conf.server $RPM_BUILD_ROOT/etc/nginx/conf.d
 
 %files
 %defattr(644,root,root,755)
@@ -58,6 +59,7 @@ install shibboleth2.xml.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 /usr/lib/systemd/system/*
 /usr/lib/chip-in
 /etc/consul.d
+/etc/nginx/conf.d
 /etc/nginx/WebGate.jwt.settings
 /var/consul
 

@@ -5,7 +5,7 @@ LOGGER=$(basename -s .sh $0)
 
 function setup_cert() {
   message "put nginx ssl setting"
-  cat > /etc/nginx/conf.d/cert.conf.server << __EOF
+  cat > /etc/nginx/conf.d/cert.conf.server << '__EOF'
 listen 443 ssl;
 # Redirect setting for SSL jwtIssuer
 set $do_redirect 0;
@@ -21,9 +21,12 @@ if ($do_redirect = 1) {
 }
 ssl_prefer_server_ciphers  on;
 ssl_protocols TLSv1.2;
+__EOF
+  cat >> /etc/nginx/conf.d/cert.conf.server << __EOF
 ssl_certificate $1;
 ssl_certificate_key $2;
 __EOF
+
   reloadNginx
 }
 
