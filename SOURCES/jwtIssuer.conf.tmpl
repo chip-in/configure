@@ -6,6 +6,7 @@ server {
   client_max_body_size 20m;
   include /etc/nginx/conf.d/*.conf.server;
   location /JWTIssuer {
+    include /etc/nginx/conf.d/*.conf.attrs;
   {{- if keyExists "saml" }}
     shib_request /shibauthorizer;
     shib_request_use_headers on;
