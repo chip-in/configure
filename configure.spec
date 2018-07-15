@@ -46,6 +46,8 @@ install jwtVerifier.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install jwtVerifier.json.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install load-certificates.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install load-certificates.sh $RPM_BUILD_ROOT/usr/bin
+install logserver-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
+install logserver.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install metadata-download.sh.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install renewCerts.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install renewCerts.timer $RPM_BUILD_ROOT/usr/lib/systemd/system

@@ -9,6 +9,10 @@ BOOTSTRAP_EXPECT=1
 RETRY_JOIN=
 if [ -n "$PEERS" ]; then
   RETRY_JOIN="retry_join: [$PEERS],"
+  OIFS=$IFS;IFS=","
+  set -- $PEERS
+  BOOTSTRAP_EXPECT=$#
+  IFS=$OIFS
 fi
 
 ENCRYPT=

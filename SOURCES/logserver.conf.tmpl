@@ -1,0 +1,5 @@
+{{- if env "LOG_SERVER_URL" }}
+location /l/ {
+  proxy_pass {{ env "LOG_SERVER_URL" }};
+}
+{{- end }}
