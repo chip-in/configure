@@ -3,6 +3,15 @@
 LOGGER=$(basename -s .sh $0)
 . /usr/lib/chip-in/functions.sh
 
+function check_cert() {
+  if [ -r /etc/nginx/conf.d/cert.conf.server ]; then
+    certfile=$(sed -n -e '/^ *ssl_certificate/s/^ *ssl_certificate *\([^ ]*\);$/\1/p' < /etc/nginx/conf.d/cert.conf.server)
+    if [ -n "$certfile" -a -r "$certfile" ]; then
+      return 0
+    fi
+  fi
+  return 1
+}
 function setup_cert() {
   message "put nginx ssl setting"
   cat > /etc/nginx/conf.d/cert.conf.server << '__EOF'
@@ -42,12 +51,17 @@ function letsEncrypt () {
     JWT_ISSUER_OPT="-d $JWT_ISSUER_FQDN"
   fi
   message "call certbot"
-  if ! certbot certonly --webroot -w /usr/share/nginx/ -d $CORE_FQDN $JWT_ISSUER_OPT \
+  if ! certbot certonly --webroot -w /usr/share/nginx/html -d $CORE_FQDN $JWT_ISSUER_OPT \
     --email "$LETS_ENCRYPT_EMAIL" --no-eff-email --agree-tos; then
     error "fail to get certificate from lets encrypt"
   fi
   setup_cert "/etc/letsencrypt/live/$CORE_FQDN/fullchain.pem" "/etc/letsencrypt/live/$CORE_FQDN/privkey.pem"
 }
+
+if check_cert; then
+  message "certificate is already set up"
+  exit 0
+fi
 
 if [ -n "$CERTIFICATE_MODE" ]; then
   case "$CERTIFICATE_MODE" in
