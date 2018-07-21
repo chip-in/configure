@@ -9,7 +9,7 @@ function load () {
   message "remove old metadatas /etc/shibboleth/metadata/*.xml"
   /bin/rm -f /etc/shibboleth/metadata/*.xml
 {{- range ls "metadatas" }}{{ $metadata := .Value | parseJSON }}
-  {{- if $metadata.url }}
+  {{- if $metadata.metadata }}
   message "Download metadata for {{ .Key }} into /etc/shibboleth/metadata/{{ .Key }}.xml"
   base64 -d  << __EOF | upload /etc/shibboleth/metadata/{{ .Key }}.xml shibboleth
 {{ base64Encode $metadata.metadata }}
