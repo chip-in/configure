@@ -45,8 +45,8 @@
 {{- end}}
         <AttributeExtractor type="XML" validate="true" >
           <am:Attributes>
-            <am:Attribute name="UID" id="UID">
-              <am:AttributeDecoder xsi:type="am:NameIDAttributeDecoder" formatter="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
+            <am:Attribute name="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" id="UID">
+              <am:AttributeDecoder xsi:type="am:NameIDAttributeDecoder" formatter="$Name"/>
             </am:Attribute>
 {{- range ls "attributes" }}{{$attribute := .Value | parseJSON}}
             <am:Attribute name="{{$attribute.source}}" id="{{ .Key }}">
