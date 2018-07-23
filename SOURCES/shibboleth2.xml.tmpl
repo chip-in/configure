@@ -13,8 +13,8 @@
     </RequestMapper>
     <ApplicationDefaults entityID="https://{{ executeTemplate "getFQDN" }}/Shibboleth.sso/Metadata" REMOTE_USER="UID">
       <Sessions lifetime="28800" timeout="3600" relayState="ss:mem" checkAddress="true" handlerSSL="true" cookieProps="https">
-{{- if keyExists "saml" }}
-  {{- range (key "saml" | .idps) }}
+{{- if keyExists "idps" }}
+  {{- range (key "idps" | parseJSON) }}
         <SSO entityID="{{ . }}">
           SAML2 SAML1
         </SSO>
@@ -48,6 +48,11 @@
             <am:Attribute name="UID" id="UID">
               <am:AttributeDecoder xsi:type="am:NameIDAttributeDecoder" formatter="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
             </am:Attribute>
+{{- range ls "attributes" }}{{$attribute := .Value | parseJSON}}
+            <am:Attribute name="{{$attribute.source}}" id="{{ .Key }}">
+              <am:AttributeDecoder xsi:type="am:{{$attribute.type}}"/>
+            </am:Attribute>
+{{- end}}
           </am:Attributes>
         </AttributeExtractor>
         <AttributeResolver type="Query" subjectMatch="true"/>

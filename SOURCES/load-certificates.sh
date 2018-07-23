@@ -51,7 +51,9 @@ function letsEncrypt () {
     JWT_ISSUER_OPT="-d $JWT_ISSUER_FQDN"
   fi
   message "call certbot"
-  if ! certbot certonly --webroot -w /usr/share/nginx/html -d $CORE_FQDN $JWT_ISSUER_OPT \
+  if certbot certificates -d $CORE_FQDN 2>&1 | grep -q 'Certificate Name:'; then
+    message "the ceritficate for $CORE_FQDN is already issued." 
+  elif ! certbot certonly --webroot -w /usr/share/nginx/html -d $CORE_FQDN $JWT_ISSUER_OPT \
     --email "$LETS_ENCRYPT_EMAIL" --no-eff-email --agree-tos; then
     error "fail to get certificate from lets encrypt"
   fi
