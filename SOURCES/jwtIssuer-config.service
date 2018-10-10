@@ -1,0 +1,20 @@
+[Unit]
+Description=JWT Issuer Configure
+Requires=consul.service
+After=consul.service nginx.service
+
+[Service]
+Type=simple
+EnvironmentFile=/var/run/SYSTEMD_ENV
+ExecStartPre=/usr/bin/env2htpasswd.sh
+ExecStart=/usr/bin/consul-template \
+  '-template=/usr/lib/chip-in/jwtIssuer.json.tmpl:/etc/nginx/WebGate.jwt.settings/jwtIssuer.json:systemctl reload nginx' \
+  '-template=/usr/lib/chip-in/jwtIssuer.conf.tmpl:/etc/nginx/conf.d/jwtIssuer.conf:systemctl reload nginx'
+ExecReload=/usr/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=30s
+KillSignal=INT
+SuccessExitStatus=12
+
+[Install]
+WantedBy=multi-user.target

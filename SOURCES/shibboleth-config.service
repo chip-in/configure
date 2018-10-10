@@ -1,0 +1,19 @@
+[Unit]
+Description=nginx load balancer Configure
+Requires=consul.service
+After=consul.service nginx.service
+
+[Service]
+Type=simple
+EnvironmentFile=/var/run/SYSTEMD_ENV
+ExecStart=/usr/bin/consul-template \
+  '-template=/usr/lib/chip-in/shibboleth2.xml.tmpl:/etc/shibboleth/shibboleth2.xml:systemctl restart shibd' \
+  '-template=/usr/lib/chip-in/metadata-download.sh.tmpl:/var/run/metadata-download.sh:/bin/bash /var/run/metadata-download.sh'
+ExecReload=/usr/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=30s
+KillSignal=INT
+SuccessExitStatus=12
+
+[Install]
+WantedBy=multi-user.target

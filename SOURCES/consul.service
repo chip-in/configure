@@ -1,14 +1,16 @@
 [Unit]
 Description=consul server daemon
-After=network.target
+After=network-online.target
+Requires=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/consul agent -ui -config-file /etc/consul.conf -config-dir /etc/consul.d
+ExecStartPre=/usr/bin/consul-env2conf.sh
+ExecStart=/usr/bin/consul agent -ui -config-file /etc/consul.json -config-dir /etc/consul.d
 ExecReload=/usr/bin/consul reload
+ExecStop=/usr/bin/consul leave
 Restart=on-failure
 RestartSec=42s
-SuccessExitStatus=1
 
 [Install]
 WantedBy=multi-user.target

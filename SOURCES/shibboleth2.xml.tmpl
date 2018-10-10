@@ -1,0 +1,73 @@
+{{- define "getFQDN" }}{{if env "JWT_ISSUER_FQDN" }}{{ env "JWT_ISSUER_FQDN" }}{{ else }}{{ env "CORE_FQDN" }}{{ end }}{{ end }}
+<SPConfig xmlns="urn:mace:shibboleth:3.0:native:sp:config"
+    xmlns:conf="urn:mace:shibboleth:3.0:native:sp:config"
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+    xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:am="urn:mace:shibboleth:2.0:attribute-map"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" clockSkew="180">
+
+    <OutOfProcess tranLogFormat="%u|%s|%IDP|%i|%ac|%t|%attr|%n|%b|%E|%S|%SS|%L|%UA|%a" />
+
+    <RequestMapper type="XML">
+      <RequestMap applicationId="default">
+        <Host name="{{ executeTemplate "getFQDN"  }}" applicationId="default"
+                authType="shibboleth"
+                requireSession="true">
+        </Host>
+      </RequestMap>
+    </RequestMapper>
+    <ApplicationDefaults entityID="https://{{ executeTemplate "getFQDN" }}/Shibboleth.sso/Metadata" REMOTE_USER="UID">
+      <Sessions lifetime="28800" timeout="3600" relayState="ss:mem" checkAddress="true" handlerSSL="true" cookieProps="https">
+{{- if keyExists "idps" }}
+  {{- range (key "idps" | parseJSON) }}
+        <SSO entityID="{{ . }}">
+          SAML2 SAML1
+        </SSO>
+  {{- end }}
+{{- end }}
+        <!-- SAML and local-only logout. -->
+        <Logout>SAML2 Local</Logout>
+
+        <!-- Extension service that generates "approximate" metadata based on SP configuration. -->
+        <Handler type="MetadataGenerator" Location="/Metadata" signing="false">
+          <!--  <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat> -->
+        </Handler>
+
+        <!-- Status reporting service. -->
+        <Handler type="Status" Location="/Status" acl="127.0.0.1 ::1"/>
+
+        <!-- Session diagnostic service. -->
+        <Handler type="Session" Location="/Session" showAttributeValues="false"/>
+
+        <!-- JSON feed of discovery information. -->
+        <Handler type="DiscoveryFeed" Location="/DiscoFeed"/>        </Sessions>
+        <Errors supportContact="root@{{ executeTemplate "getFQDN"  }}" helpLocation="/about.html"
+            styleSheet="/shibboleth-sp/main.css"/>
+{{- range ls "metadatas" }}{{$metadata := .Value | parseJSON}}
+  {{- if $metadata.url}}
+        <MetadataProvider type="XML" validate="false" url="{{$metadata.url}}" backingFilePath="{{.Key}}.xml" />
+  {{- else}}
+        <MetadataProvider type="XML" validate="false" file="{{.Key}}.xml" />
+  {{- end}}
+{{- end}}
+        <AttributeExtractor type="XML" validate="true" >
+          <am:Attributes>
+            <!-- <am:Attribute name="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" id="UID"> -->
+            <am:Attribute name="urn:oasis:names:tc:SAML:2.0:nameid-format:transient" id="UID">
+              <am:AttributeDecoder xsi:type="am:NameIDAttributeDecoder" formatter="$Name"/>
+            </am:Attribute>
+{{- range ls "attributes" }}{{$attribute := .Value | parseJSON}}
+            <am:Attribute name="{{$attribute.source}}" id="{{ .Key }}">
+              <am:AttributeDecoder xsi:type="am:{{$attribute.type}}"/>
+            </am:Attribute>
+{{- end}}
+          </am:Attributes>
+        </AttributeExtractor>
+        <AttributeResolver type="Query" subjectMatch="true"/>
+        <CredentialResolver type="File" use="signing"
+            key="sp-signing-key.pem" certificate="sp-signing-cert.pem"/>
+        <CredentialResolver type="File" use="encryption"
+            key="sp-encrypt-key.pem" certificate="sp-encrypt-cert.pem"/>
+    </ApplicationDefaults>
+    <SecurityPolicyProvider type="XML" validate="true" path="security-policy.xml"/>
+    <ProtocolProvider type="XML" validate="true" reloadChanges="false" path="protocols.xml"/>
+</SPConfig>

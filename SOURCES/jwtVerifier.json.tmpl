@@ -1,0 +1,33 @@
+{
+{{- if keyExists "jwt" }}
+  "fqdn": "{{ env "CORE_FQDN" }}",
+  "type": "verify",
+  "decode": {
+      "key": "{{ $jwt:= key "jwt" | parseJSON}}{{ $jwt.sharedKey }}"
+  },
+  "receive": {
+    "byCookie": {
+      "name": "access_token"
+    },
+    "byQuery": {
+      "name":"access_token"
+    }
+  },
+  "onDeny": {
+  {{- if env "JWT_ISSUER_FQDN" }}
+    {{- scratch.Set "scheme" "http"}}
+    {{- if env "CERTIFICATE_MODE" }}
+      {{- scratch.Set "scheme" "https"}}
+    {{- end }}
+    "code": "302",
+    "redirect": {
+      "uri": "{{ scratch.Get "scheme" }}://{{ env "JWT_ISSUER_FQDN" }}/JWTIssuer",
+      "param_name": "redirect_uri"
+    }
+  {{- else }}
+    "code": "401",
+    "template": "deny.template.html"
+  {{- end }}
+  }
+{{- end }}
+}

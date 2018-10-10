@@ -1,6 +1,6 @@
 %define		debug_package %{nil}
 Name: chip-in-configure
-Version: 1.0.0
+Version: 1.0.1
 Release: %{CHIP_IN_REVISION}%{?dist}
 Group: Applications/System
 Summary: Auto configuration tool for chip-in core node system
@@ -10,6 +10,7 @@ License:	MIT
 Requires:	nodejs
 Requires:	npm
 Requires:	nginx
+Requires:	mod_ssl
 
 %description
 
@@ -26,23 +27,42 @@ mkdir -p $RPM_BUILD_ROOT/usr/lib/chip-in
 mkdir -p $RPM_BUILD_ROOT/etc/chip-in
 mkdir -p $RPM_BUILD_ROOT/var/consul
 mkdir -p $RPM_BUILD_ROOT/etc/consul.d
+mkdir -p $RPM_BUILD_ROOT/etc/nginx/conf.d
+mkdir -p $RPM_BUILD_ROOT/etc/nginx/WebGate.jwt.settings
 unzip consul.zip -d $RPM_BUILD_ROOT/usr/bin
 unzip consul-template -d $RPM_BUILD_ROOT/usr/bin
-install chip-in-config.sh.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
-install functions.sh $RPM_BUILD_ROOT/usr/lib/chip-in
+install consul-env2conf.sh $RPM_BUILD_ROOT/usr/bin
 install consul.service $RPM_BUILD_ROOT/usr/lib/systemd/system
-install chip-in-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
-install consul.conf $RPM_BUILD_ROOT/etc
 install default.conf $RPM_BUILD_ROOT/usr/lib/chip-in
-echo "[]" > $RPM_BUILD_ROOT/etc/chip-in/kvs.json
+install deny.template.html $RPM_BUILD_ROOT/etc/nginx/WebGate.jwt.settings
+install error.template.json $RPM_BUILD_ROOT/etc/nginx/WebGate.jwt.settings
+install env2htpasswd.sh $RPM_BUILD_ROOT/usr/bin
+install functions.sh $RPM_BUILD_ROOT/usr/lib/chip-in
+install jwtIssuer-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
+install jwtIssuer.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install jwtIssuer.json.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install jwtVerifier-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
+install jwtVerifier.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install jwtVerifier.json.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install load-certificates.service $RPM_BUILD_ROOT/usr/lib/systemd/system
+install load-certificates.sh $RPM_BUILD_ROOT/usr/bin
+install logserver-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
+install logserver.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install metadata-download.sh.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install renewCerts.service $RPM_BUILD_ROOT/usr/lib/systemd/system
+install renewCerts.timer $RPM_BUILD_ROOT/usr/lib/systemd/system
+install shibboleth-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
+install shibboleth2.xml.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install setting.conf.server $RPM_BUILD_ROOT/etc/nginx/conf.d
 
 %files
 %defattr(644,root,root,755)
-%attr(755,root,root) /usr/bin/consul
-%attr(755,root,root) /usr/bin/consul-template
+%attr(755,root,root) /usr/bin/*
 /usr/lib/systemd/system/*
 /usr/lib/chip-in
-/etc
+/etc/consul.d
+/etc/nginx/conf.d
+/etc/nginx/WebGate.jwt.settings
 /var/consul
 
 %post

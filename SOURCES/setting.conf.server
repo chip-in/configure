@@ -1,0 +1,4 @@
+location /WebGate.jwt.settings {
+  internal;
+  root /etc/nginx;
+}

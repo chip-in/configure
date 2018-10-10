@@ -1,0 +1,7 @@
+[Unit]
+Description=Renew Certificates from lets encrypt
+Requires=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/certbot renew

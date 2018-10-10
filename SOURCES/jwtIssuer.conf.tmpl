@@ -1,0 +1,49 @@
+{{- if env "JWT_ISSUER_FQDN" }}
+server {
+  listen       80;
+  server_name  {{ env "JWT_ISSUER_FQDN" }};
+  root   /usr/share/nginx/html;
+  client_max_body_size 20m;
+  include /etc/nginx/conf.d/*.conf.server;
+  location /JWTIssuer {
+    include /etc/nginx/conf.d/*.conf.attrs;
+  {{- if keyExists "idps" }}
+    shib_request /shibauthorizer;
+    shib_request_use_headers on;
+    include shib_clear_headers;
+  {{- else }}
+    auth_basic "Restricted";
+    auth_basic_user_file htpasswd;
+  {{- end }}
+    set $issuerconf "jwtIssuer.json";
+    content_by_lua_file lua/jwtIssue.lua;
+  }
+  {{- if keyExists "idps" }}
+  # FastCGI authorizer for Shibboleth Auth Request module
+  location = /shibauthorizer {
+      internal;
+      include fastcgi_params;
+      fastcgi_pass unix:/var/run/shibboleth/shibauthorizer.sock;
+      client_max_body_size 0;
+  }
+  #FastCGI responder
+  location /Shibboleth.sso {
+      include fastcgi_params;
+      fastcgi_pass unix:/var/run/shibboleth/shibresponder.sock;
+  }
+  #Resources for the Shibboleth error pages.
+  location /shibboleth-sp {
+      alias /usr/share/shibboleth/;
+  }
+  {{- end }}
+  location / {
+      index  index.html index.htm;
+  }
+
+  error_page   500 502 503 504  /50x.html;
+  location = /50x.html {
+  }
+
+  access_log /var/log/nginx/jwtIssuer.log chip_in_core;
+}
+{{- end }}
