@@ -1,0 +1,9 @@
+{
+{{- if keyExists "jwt" }}
+  {{- $jwt:= key "jwt" | parseJSON}}
+  "key": {{toJSON $jwt.sharedKey}} ,
+{{- end}}
+{{- if keyExists "acl" }}
+  "acl": {{ key "acl" }}
+{{- end}}
+}
