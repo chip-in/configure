@@ -1,7 +1,7 @@
 %define		debug_package %{nil}
 Name: chip-in-configure
-Version: 1.0.1
-Release: %{CHIP_IN_REVISION}%{?dist}
+Version: %{CHIP_IN_VERSION}
+Release: %{CHIP_IN_RELEASE}%{?dist}
 Group: Applications/System
 Summary: Auto configuration tool for chip-in core node system
 Packager: "Mitsuru Nakakawaji" <mitsuru@procube.jp>

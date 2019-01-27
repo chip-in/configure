@@ -17,4 +17,4 @@ COPY configure.spec ${HOME}/rpmbuild/SPECS/
 COPY SOURCES/* ${HOME}/rpmbuild/SOURCES/
 RUN chown -R builder:builder .
 USER builder
-CMD ["/usr/bin/rpmbuild","-bb","-D","CHIP_IN_REVISION 3","rpmbuild/SPECS/configure.spec"]
+CMD ["/usr/bin/rpmbuild","-bb","-D","CHIP_IN_RELEASE 0","-D","CHIP_IN_VERSION 0.0.0","rpmbuild/SPECS/configure.spec"]
