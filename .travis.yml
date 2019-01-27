@@ -4,10 +4,10 @@ services:
   - docker
 install: true
 before_script:
-  - TAG=${TRAVIS_TAG:-0.0.0}
-  - VERSION=${TAG%.*}
-  - RELEASE=${TAG##*.}
-  - RELEASE=${RELEASE:-0}
+  - TAG=$(git describe --long)
+  - VERSION=${TAG%%-*}
+  - RELEASE=${TAG#*-}
+  - RELEASE=${RELEASE%%-*}
 script:
   - docker build -t chipin/configure-rpm .
   - mkdir -p /tmp/RPMS/x86_64
@@ -16,7 +16,7 @@ script:
   - (cd /tmp;tar -czf - RPMS) > $TRAVIS_BUILD_DIR/configure-rpm.tar.gz
 deploy:
   provider: releases
-  name: $VERSION
+  name: $VERSION on $TRAVIS_BRANCH
   api_key:
     secure: PeWzJRj4uo+7A2g8HlSF3RTUau7IEZpwQzQw3ZHFitm2XRt6E7inFgrrTj4/umt6HVuvjXv3dYRFeW7lFzliUlPq2WqRuCGVXzgLlTKgHFwiMWyWS0p12S6MZqgufb6ril5DftEvaJ8fuZU2iP4zDDkjBy5jwCGbx0rl+saZrAR7AtdF0PZs8n0hVQN4UO56p7zJGe+Fs5v9xMgZzy4MDP7aCR9woixH83u5on/VxYTzmtzNjMRYCU94nGfJ0sbfzZsx6v5FWYVZzWLWtCAE54po+kyAyeY8S4cLHTvVMm6x+ch7sMyctiHJuAuEupZWOcOwziqiaymogJM4wLP0hL0rY1Tc+f2DtOAuDGJ+SDY9Y886aF2Or95svav0pgBTLtWtcVBSVHuaMJIytdfQ/G8W8lxCaXM8FutUvjinV/jt5pgjozxQi9l9xbO9L+2iKPYmwjDKFrSGyzdJJU/7WnVPqlN8PUj1XJ30VYyzab0N4ErErV57C2L7jGosl7j7JteWuJewq7TL6QPmL9btXjXMidaI7gMRo+y9wkVAfVp3nkFaKJZkhbb57IRb/0xR3CbaFqCfZOsBxbryccLFF8HirDfKSOEwxQYOsYWvwVjvAw/iIWXa9F90nG13GrxBRbaqzbqKu9aBNssbkEhBOmjGFLYS1PeUu3GQYZVote4=
   file: configure-rpm.tar.gz
@@ -24,4 +24,3 @@ deploy:
   skip_cleanup: true
   on:
     repo: chip-in/configure
-    tags: true
