@@ -3,9 +3,10 @@ language: ruby
 services:
 - docker
 install: true
+if: branch = develop AND (NOT tag =~ /a$/)
 before_script:
-- TAG=$(git describe --long --tags)
-- VERSION=${TAG%%-*}
+- TAG=$(git describe --long)
+- VERSION=${TAG%%a*}
 - RELEASE=${TAG#*-}
 - RELEASE=${RELEASE%%-*}
 script:
@@ -19,7 +20,7 @@ script:
 before_deploy:
 - TRAVIS_TAG=$VERSION
 deploy:
-- provider: releases
+  provider: releases
   api_key:
     secure: Lx6m0KQYYxaP96Nv61NT/Cd4wp1TEUf8WJ9q+/6gHPzXOTIVVFeqSzsFFB58yQkmok1BpheA2/HJZRG7TgTMJTFf2QEpW4Zl8IlzPe8Q2JHeUSzIxY22jBQThZfU+7BmQQPClDydGf5MKWEgig1DBsdeByPVyXoD7DHWmF9WwVxlj1NT0i5FW7Z98LGCxGBygKEbCMOqj5GiRoBiF4FxxcBcXm1Cbr583FUm4lVxKUesI4c0N9o1cbYCI96c6VwPJa39Ulkqadkno7byTWenk1mVN8rtQ7ClhJsN+IY7hh8/0c6Y3aZPu+isKFfElaCfjUiv6F47N4p1nyvtSs40BgiXJdD1DmRoa+T2Hu+4NmIfmrEDS1BBllHJaSuxmA4n4XCbnUu4HL0+BJRQwYQQV14/BY03Xmj4pkq2r1NE+e4Rfn/OAvkro0PIK7ydeWM7mGV7HFW+a53bXJsWRp5CJ6nuZcaV0PC+xI8NDUWB7GR7cdHCi8W4Iuw0kpq1jguMe68MQjyM8L1x0SORfipJrwei8pH4THxK+vX5Q6d8dfYrz5xj5KjP1wqnE9D7YUk9fINbpuje+fIJZjw2e55PV8QkaevoQeWbPmspLPQlPDYNQepPsjl7wdElLI68t7eWw5NWdxf+uIVZmZHzbKsP9fTRltD04jtpQOBIIRNBox4=
   file: configure-rpm.tar.gz
@@ -29,13 +30,3 @@ deploy:
   on:
     repo: chip-in/configure
     branch: develop
-- provider: releases
-  api_key:
-    secure: PeWzJRj4uo+7A2g8HlSF3RTUau7IEZpwQzQw3ZHFitm2XRt6E7inFgrrTj4/umt6HVuvjXv3dYRFeW7lFzliUlPq2WqRuCGVXzgLlTKgHFwiMWyWS0p12S6MZqgufb6ril5DftEvaJ8fuZU2iP4zDDkjBy5jwCGbx0rl+saZrAR7AtdF0PZs8n0hVQN4UO56p7zJGe+Fs5v9xMgZzy4MDP7aCR9woixH83u5on/VxYTzmtzNjMRYCU94nGfJ0sbfzZsx6v5FWYVZzWLWtCAE54po+kyAyeY8S4cLHTvVMm6x+ch7sMyctiHJuAuEupZWOcOwziqiaymogJM4wLP0hL0rY1Tc+f2DtOAuDGJ+SDY9Y886aF2Or95svav0pgBTLtWtcVBSVHuaMJIytdfQ/G8W8lxCaXM8FutUvjinV/jt5pgjozxQi9l9xbO9L+2iKPYmwjDKFrSGyzdJJU/7WnVPqlN8PUj1XJ30VYyzab0N4ErErV57C2L7jGosl7j7JteWuJewq7TL6QPmL9btXjXMidaI7gMRo+y9wkVAfVp3nkFaKJZkhbb57IRb/0xR3CbaFqCfZOsBxbryccLFF8HirDfKSOEwxQYOsYWvwVjvAw/iIWXa9F90nG13GrxBRbaqzbqKu9aBNssbkEhBOmjGFLYS1PeUu3GQYZVote4=
-  file: configure-rpm.tar.gz
-  name: $VERSION on master
-  overwrite: true
-  skip_cleanup: true
-  on:
-    repo: chip-in/configure
-    branch: master
