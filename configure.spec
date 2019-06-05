@@ -42,6 +42,7 @@ install jwtIssuer-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install jwtIssuer.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install jwtIssuer.json.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install acl.json.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install mosquitto.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install jwtVerifier-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install jwtVerifier.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install jwtVerifier.json.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in

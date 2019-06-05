@@ -3,7 +3,29 @@
   {{- $jwt:= key "jwt" | parseJSON}}
   "key": {{toJSON $jwt.sharedKey}} ,
 {{- end}}
+{{- if keyOrDefault "useACL" "false" | parseBool }}
 {{- if keyExists "acl" }}
   "acl": {{ key "acl" }}
+{{- end}}
+{{ else }}
+  "acl": [{
+    "resource": {
+      "path": {
+        "regex": "/.*"
+      },
+      "type": "application"
+    },
+    "name": "any-application",
+    "accesses": [{"operation": "*"}]
+  }, {
+    "resource": {
+      "path": {
+        "regex": "/.*"
+      },
+      "type": "dadget"
+    },
+    "name": "any-database",
+    "accesses": [{"operation": "*"}]
+  }]
 {{- end}}
 }
