@@ -1,0 +1,18 @@
+[Unit]
+Description=Nginx Configure
+Requires=consul.service
+After=consul.service nginx.service
+
+[Service]
+Type=simple
+EnvironmentFile=/var/run/SYSTEMD_ENV
+ExecStart=/usr/bin/consul-template \
+  '-template=/usr/lib/chip-in/default.conf.tmpl:/etc/nginx/conf.d/default.conf:systemctl reload nginx'
+ExecReload=/usr/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=30s
+KillSignal=INT
+SuccessExitStatus=12
+
+[Install]
+WantedBy=multi-user.target
