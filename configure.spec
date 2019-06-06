@@ -34,9 +34,7 @@ unzip consul-template -d $RPM_BUILD_ROOT/usr/bin
 install consul-env2conf.sh $RPM_BUILD_ROOT/usr/bin
 install consul.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install default.conf $RPM_BUILD_ROOT/usr/lib/chip-in
-install deny.template.html $RPM_BUILD_ROOT/etc/nginx/jwt.settings
 install error.template.json $RPM_BUILD_ROOT/etc/nginx/jwt.settings
-install succeeded.template.json $RPM_BUILD_ROOT/etc/nginx/jwt.settings
 install env2htpasswd.sh $RPM_BUILD_ROOT/usr/bin
 install functions.sh $RPM_BUILD_ROOT/usr/lib/chip-in
 install jwtIssuer-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
