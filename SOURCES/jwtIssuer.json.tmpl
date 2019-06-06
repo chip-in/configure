@@ -6,7 +6,8 @@
   "encode": {
     "alg": "HS256",
     "expSec": "{{ $jwt.expSec }}",
-    "key": "{{ $jwt.sharedKey }}"
+    "key": "{{ $jwt.sharedKey }}",
+    "updateExpSec": "{{ $jwt.updateExpSec }}"
   },
   "subject":
   {
@@ -28,6 +29,9 @@
     {
       "uriPattern": {{ toJSON $jwt.uriPattern }},
       "param_name":"access_token"
+    },
+    "content": {
+      "template": "succeeded.template.json"
     }
   },
   "onError":

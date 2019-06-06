@@ -1,5 +1,6 @@
 {{- if env "LOG_SERVER_URL" }}
 location /l/ {
   proxy_pass {{ env "LOG_SERVER_URL" }};
+  proxy_set_header X-Forwarded-for $remote_addr;
 }
 {{- end }}
