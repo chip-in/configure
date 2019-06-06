@@ -13,6 +13,15 @@
       "name":"access_token"
     }
   },
+  {{- if keyExists "idps" }}
+    "diff_attrs": {
+      "attribute_resolver": {
+          "entity_id": "{{- range $idx, $idp := ( key "idps" | parseJSON ) }}{{- if ( eq $idx 0 ) }}{{$idp}}{{- end}}{{- end}}"
+      },
+      "targets": [{{- range $idx, $attribute := ls "attributes"  }}{{- $attribute := .Value|parseJSON}}
+        {{- if $idx}},{{- end}}"{{$attribute.source}}" {{- end}}]
+    },
+  {{- end }}
   "onDeny": {
   {{- if env "JWT_ISSUER_FQDN" }}
     {{- scratch.Set "scheme" "http"}}

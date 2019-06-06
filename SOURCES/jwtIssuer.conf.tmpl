@@ -6,6 +6,7 @@ server {
   client_max_body_size 20m;
   include /etc/nginx/conf.d/*.conf.server;
   location /JWTIssuer {
+    include /etc/nginx/jwt.settings/cors-common.conf;
     include /etc/nginx/conf.d/*.conf.attrs;
   {{- if keyExists "idps" }}
     shib_request /shibauthorizer;
@@ -17,6 +18,14 @@ server {
   {{- end }}
     set $issuerconf "jwtIssuer.json";
     content_by_lua_file lua/jwtIssue.lua;
+  }
+  location /core.JWTUpdate {
+    include /etc/nginx/jwt.settings/cors-common.conf;
+    include /etc/nginx/conf.d/*.conf.attrs;
+    set $verifyconf "jwtVerifier.json";
+    set $issuerconf "jwtIssuer.json";
+    access_by_lua_file /etc/nginx/lua/jwtUpdateVerify.lua;
+    content_by_lua_file /etc/nginx/lua/jwtIssue.lua;
   }
   {{- if keyExists "idps" }}
   # FastCGI authorizer for Shibboleth Auth Request module
