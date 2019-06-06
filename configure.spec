@@ -33,7 +33,8 @@ unzip consul.zip -d $RPM_BUILD_ROOT/usr/bin
 unzip consul-template -d $RPM_BUILD_ROOT/usr/bin
 install consul-env2conf.sh $RPM_BUILD_ROOT/usr/bin
 install consul.service $RPM_BUILD_ROOT/usr/lib/systemd/system
-install default.conf $RPM_BUILD_ROOT/usr/lib/chip-in
+install default.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install nginx-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install error.template.json $RPM_BUILD_ROOT/etc/nginx/jwt.settings
 install env2htpasswd.sh $RPM_BUILD_ROOT/usr/bin
 install functions.sh $RPM_BUILD_ROOT/usr/lib/chip-in
@@ -66,10 +67,5 @@ install setting.conf.server $RPM_BUILD_ROOT/etc/nginx/conf.d
 /etc/nginx/conf.d
 /etc/nginx/jwt.settings
 /var/consul
-
-%post
-if [ "$1" = "1" ]; then
-  cp -p /usr/lib/chip-in/default.conf /etc/nginx/conf.d/default.conf
-fi
 
 %changelog
