@@ -1,0 +1,6 @@
+{
+  "service": {
+    "name": "hmr", 
+    "port": 3000
+    }
+}
