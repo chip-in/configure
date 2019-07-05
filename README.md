@@ -15,6 +15,15 @@ consul の設定ファイルは環境変数を参照して /etc/consul.conf と�
 ----|----|----
 |PEERS|no|他のコアノードのIPアドレスのリスト（カンマ区切り）|
 |CONSUL_SHARED_KEY|no| consul のクラスタ通信における共有鍵を指定する|
+|CONSUL_NODE_NAME|no| ノード名|
+|CONSUL_ACL_ENABLED|no|consul の ACL 機能を有効にするかどうかのフラグで、デフォルトはfalse（ACL無し：全許可）|
+
+## consul API のリバースプロキシ設定
+consul API へのリバースプロキシ設定がnginx 設定に追加される。
+HTTP レベルの認証設定は、「JWT認証設定」の設定内容に従う。
+
+## consul クラスタ内の他のコアノードへのリバースプロキシ設定
+同一データセンタ内の consul クラスタメンバへの直結用リバースプロキシパス設定が作成される。
 
 # nginx の設定ファイル
 nginxでは、コアノードサーバとJWT発行サーバの2つの仮想サーバが設定される。
@@ -100,12 +109,77 @@ https:// _FQDN_ /Shibboleth.sso/Metadata
 # ログ収集サーバ
 環境変数 LOG_SERVER_URL が設定されている場合、/l ロケーションへの http リクエストをそのURLにプロキシ転送する。
 
-# mosquitto の設定ファイル
-mosqitto の ACL を設定する（未設計/未実装）
+# ACL設定 
+KVS 上のキー useACL がtrue の場合、 mosqitto / HMR の ACL 機能が有効となる。
+ACL の定義をキー acl の値として設定する。
+なお、ACL設定を使用するためには、「JWT 認証設定」が必要である。
 
-# core ノード起動後のKVSへの設定のアップロード
-（未設計/未実装）
-
-# jwt 発行コマンド
-（未設計/未実装）
+## ACL 
+chip-in のアクセス制御はコアデータベースに保持されるACLに基づいて行われる。ACLはACEのリストである。以下に記述例を示す。
+```JSON
+[{
+  "name": "login users can write contents",
+  "resource": {
+    "path": {
+      "regex": "/app/.*"
+    },
+    "type": "application"
+  },
+  "accesses": [{
+      "operation": "READ"
+    },{
+      "subject" : {
+        "app_role_name" : "loginUser"
+      },
+      "operation": "WRITE"
+    }]
+}, {
+  "name": "admin users can access admin-contents",
+  "resource": {
+    "path": {
+      "regex": "/appdatabase/admincontents"
+    },
+    "type": "dadget"
+  },
+  "accesses": [{
+      "subject" : {
+        "app_role_name" : "admin"
+      },
+      "operation": "WRITE"
+    }]
+}, {
+  "name": "login users can access contents",
+  "resource": {
+    "path": {
+      "regex": "/appdatabase/contents"
+    },
+    "type": "dadget"
+  },
+  "accesses": [{
+      "subject" : {
+        "app_role_name" : "loginUser"
+      },
+      "operation": "WRITE"
+    }]
+}]
+```
+### ACE 
+ACEはリソースに対する適用条件（以降、リソース条件と呼ぶ）とアクセスポリシーからなる。
+|項目名|属性名|説明|
+----|----|----
+|リソース条件|resource|このACEが適用対象となるための条件を属性値で指定する|
+|アクセスポリシー|accesses|このACEが適用対象となった場合に適用するルールのリスト|
+ACLの中で最初にリソース条件がマッチしたACEが適用され、残りのACEは無視される。
+### リソース条件
+リソースの属性の値に対するマッチングを記述する。
+|項目名|属性名|説明|
+----|----|----
+|リソース条件|type|リソースのタイプを指定する。 application/dadget のいずれかである|
+|アクセスポリシー|path|リソースのパスとのマッチングを指定する。文字列を指定した場合、その値が一致した場合適用対象となる。regex属性を持つ構造体が指定された場合、正規表現によるマッチングに成功すると適用対象となる。typeがapplication の場合、マウントパスの先頭から"/a"を削除した値を指定する(例：マウントパスが/a/app/"の場合、"/app/"。typeがdadgetの場合、"/:データベース名"または "/:データベース名/:サブセット名"の形式の値を指定する。|
+### ルール
+ルールはアクセスしている主体（ユーザやサービス提供プロセス）に対する適用条件（以降、主体条件と呼ぶ）と操作種別の組である。主体条件は省略可能であり、省略した場合はすべての主体に対して適用される。
+|項目名|属性名|説明|
+----|----|----
+|主体条件|subject|主体の属性に対する条件を構造体で指定する。構造体の各属性に対する指定と主体の属性値とのマッチングを行う。属性値として文字列を指定した場合、その値が主体の属性値と一致した場合適用対象となる。属性値としてregex属性を持つ構造体が指定された場合、正規表現によるマッチングに成功すると適用対象となる。|
+|操作種別|operation|アクセスが実行する操作の種別を指定する。"READ"(データの読み出しが許可される)、"WRITE"（データに対する書き込みが許可される）、"*"(データのプロビジョニングを含めてすべての操作が許可される)のいずれか|
 
