@@ -44,6 +44,39 @@ server {
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
   }
+
+  {{ range service "hmr" }}
+  # {{.|toJSON}}
+  location ~ /{{.NodeID}}/([ad]/.*)$ {
+      include /etc/nginx/conf.d/*.conf.location;
+      proxy_pass http://{{.Address}}:3000/$1;
+      proxy_redirect ~^https?://([^/]+)(?::[0-9]+)?/[^/]+(/.*)$ https://$1:443$2;
+      client_max_body_size 20m;
+      proxy_http_version 1.1;
+      proxy_set_header Connection "";
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-Proto https;
+      proxy_set_header X-Forwarded-Host $host;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Request-ID $request_id;
+  }
+  location  /{{.NodeID}}/r {
+      include /etc/nginx/conf.d/*.conf.location;
+      proxy_pass http://{{.Address}}:3000/r;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+  }
+  location /{{.NodeID}}/m {
+      include /etc/nginx/conf.d/*.conf.location;
+      proxy_pass http://{{.Address}}:1833/m;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+  }
+  {{ end }}
+
   {{- if keyExists "jwt" }}
   {{- if env "JWT_ISSUER_FQDN" }}
   location /core.JWTUpdate {
