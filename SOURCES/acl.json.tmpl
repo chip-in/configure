@@ -26,6 +26,15 @@
     },
     "name": "any-database",
     "accesses": [{"operation": "*"}]
+  }, {
+    "resource": {
+      "path": {
+        "regex": "/.*"
+      },
+      "type": "mqtt"
+    },
+    "name": "any-pubsub",
+    "accesses": [{"operation": "*"}]
   }]
 {{- end}}
 }
