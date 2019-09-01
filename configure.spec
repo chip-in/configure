@@ -29,6 +29,7 @@ mkdir -p $RPM_BUILD_ROOT/var/consul
 mkdir -p $RPM_BUILD_ROOT/etc/consul.d
 mkdir -p $RPM_BUILD_ROOT/etc/nginx/conf.d
 mkdir -p $RPM_BUILD_ROOT/etc/nginx/jwt.settings
+mkdir -p $RPM_BUILD_ROOT/etc/letsencrypt/renewal-hooks/post
 unzip consul.zip -d $RPM_BUILD_ROOT/usr/bin
 unzip consul-template -d $RPM_BUILD_ROOT/usr/bin
 install consul-env2conf.sh $RPM_BUILD_ROOT/usr/bin
@@ -58,6 +59,7 @@ install shibboleth-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install shibboleth2.xml.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install setting.conf.server $RPM_BUILD_ROOT/etc/nginx/conf.d
 install hmr.json $RPM_BUILD_ROOT/etc/consul.d
+install reload-nginx.sh $RPM_BUILD_ROOT/etc/letsencrypt/renewal-hooks/post
 
 %files
 %defattr(644,root,root,755)
@@ -68,5 +70,7 @@ install hmr.json $RPM_BUILD_ROOT/etc/consul.d
 /etc/nginx/conf.d
 /etc/nginx/jwt.settings
 /var/consul
+/etc/letsencrypt/renewal-hooks/post
+%attr(755,root,root) /etc/letsencrypt/renewal-hooks/post/reload-nginx.sh
 
 %changelog
