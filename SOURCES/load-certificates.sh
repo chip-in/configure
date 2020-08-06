@@ -51,11 +51,27 @@ function letsEncrypt () {
     JWT_ISSUER_OPT="-d $JWT_ISSUER_FQDN"
   fi
   message "call certbot"
+  sleep 1
   if certbot certificates -d $CORE_FQDN 2>&1 | grep -q 'Certificate Name:'; then
-    message "the ceritficate for $CORE_FQDN is already issued." 
-  elif ! certbot certonly --webroot -w /usr/share/nginx/html -d $CORE_FQDN $JWT_ISSUER_OPT \
-    --email "$LETS_ENCRYPT_EMAIL" --no-eff-email --agree-tos; then
-    error "fail to get certificate from lets encrypt"
+    message "the ceritficate for $CORE_FQDN is already issued."
+  else
+    local count=${GIP_CHECK_RETRY:-40}
+    local interval=${GIP_CHECK_INTERVAL:-15}
+    while ! (host_result=$(host -4 $CORE_FQDN) && my_gip=$(curl -s https://api.ipify.org) && [ "${host_result##* }" == "$my_gip" ])
+    do
+      count=$(( $count - 1 ))
+      if [ $count -eq 0 ]; then
+              break
+      fi
+      sleep $interval
+      message "check global ip: retry check $CORE_FQDN interval=$interval rest=$count"
+    done
+    if [ $count -eq 0 ]; then
+      error "check global ip: exceed max retry count ${GIP_CHECK_RETRY:-10}"
+    elif ! certbot certonly --webroot -w /usr/share/nginx/html -d $CORE_FQDN $JWT_ISSUER_OPT \
+      --email "$LETS_ENCRYPT_EMAIL" --no-eff-email --agree-tos; then
+      error "fail to get certificate from lets encrypt"
+    fi
   fi
   setup_cert "/etc/letsencrypt/live/$CORE_FQDN/fullchain.pem" "/etc/letsencrypt/live/$CORE_FQDN/privkey.pem"
 }

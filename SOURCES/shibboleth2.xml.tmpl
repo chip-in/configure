@@ -5,7 +5,16 @@
     xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:am="urn:mace:shibboleth:2.0:attribute-map"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" clockSkew="180">
 
-    <OutOfProcess tranLogFormat="%u|%s|%IDP|%i|%ac|%t|%attr|%n|%b|%E|%S|%SS|%L|%UA|%a" />
+    <OutOfProcess tranLogFormat="%u|%s|%IDP|%i|%ac|%t|%attr|%n|%b|%E|%S|%SS|%L|%UA|%a">
+      <Extensions>
+        <Library path="plugins.so" fatal="true" />
+      </Extensions>
+    </OutOfProcess>
+    <InProcess catchAll="true">
+      <Extensions>
+        <Library path="plugins-lite.so" fatal="true" />
+      </Extensions>
+    </InProcess>
 
     <RequestMapper type="XML">
       <RequestMap applicationId="default">
@@ -46,7 +55,7 @@
   {{- if $metadata.url}}
         <MetadataProvider type="XML" validate="false" url="{{$metadata.url}}" backingFilePath="{{.Key}}.xml" />
   {{- else}}
-        <MetadataProvider type="XML" validate="false" file="{{.Key}}.xml" />
+        <MetadataProvider type="XML" validate="false" path="metadata/{{.Key}}.xml" />
   {{- end}}
 {{- end}}
         <AttributeExtractor type="XML" validate="true" >

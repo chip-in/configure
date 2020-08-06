@@ -34,6 +34,8 @@ cat > /etc/consul.json << __EOF
   "data_dir" : "/var/consul",
   "log_level": "INFO",
   "bootstrap_expect": ${BOOTSTRAP_EXPECT},
+  "bind_addr": "0.0.0.0",
+  "advertise_addr": "{{ GetPrivateIP }}",
   ${RETRY_JOIN}
   ${ENCRYPT}
   ${NODE_NAME}
