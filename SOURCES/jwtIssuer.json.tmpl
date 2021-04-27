@@ -16,7 +16,7 @@
   },
   "privateClaim":
   {
-    "copyFromHeader": {{ toJSON  $jwt.attrs}}
+    "copyFromVariable": {{ toJSON  $jwt.attrs}}
   },
   "onSuccess":
   {
