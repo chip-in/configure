@@ -58,6 +58,7 @@ install renewCerts.timer $RPM_BUILD_ROOT/usr/lib/systemd/system
 install shibboleth-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install shibboleth2.xml.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
 install setting.conf.server $RPM_BUILD_ROOT/etc/nginx/conf.d
+install server-token.conf $RPM_BUILD_ROOT/etc/nginx/conf.d
 install hmr.json $RPM_BUILD_ROOT/etc/consul.d
 install reload-nginx.sh $RPM_BUILD_ROOT/etc/letsencrypt/renewal-hooks/post
 
