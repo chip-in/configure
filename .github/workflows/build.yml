@@ -1,0 +1,39 @@
+name: CI
+on:
+  push:
+    tags-ignore:
+      - '*a'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set TAG
+        run: |
+          echo 'TAG<<EOF' >> $GITHUB_ENV
+          git describe --long >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+      - name: Set VERSION
+        run: echo VERSION=${TAG%%a*} >> $GITHUB_ENV
+      - name: Set RELEASE
+        run: echo RELEASE=${TAG#*-} >> $GITHUB_ENV
+      - name: Set RELEASE2
+        run: echo RELEASE=${RELEASE%%-*} >> $GITHUB_ENV
+      - name: Build
+        env:
+          TRAVIS_BUILD_DIR: ${{ github.workspace }}
+        run: |
+          docker build -t chipin/configure-rpm .
+          mkdir -p /tmp/RPMS/x86_64
+          sudo chown 111:111 -R /tmp/RPMS
+          docker run --rm --name configure-rpm -v /tmp/RPMS:/home/builder/rpmbuild/RPMS chipin/configure-rpm /usr/bin/rpmbuild -bb -D "CHIP_IN_RELEASE $RELEASE" -D "CHIP_IN_VERSION $VERSION" rpmbuild/SPECS/configure.spec
+          (cd /tmp;tar -czf - RPMS) > $TRAVIS_BUILD_DIR/configure-rpm.tar.gz
+      - name: Release
+        uses: softprops/action-gh-release@v0.1.5
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: configure-rpm.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
