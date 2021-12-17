@@ -7,8 +7,6 @@ Summary: Auto configuration tool for chip-in core node system
 Packager: "Mitsuru Nakakawaji" <mitsuru@procube.jp>
 Source0: configure
 License:	MIT
-Requires:	nodejs
-Requires:	npm
 Requires:	nginx
 Requires:	mod_ssl
 
