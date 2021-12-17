@@ -33,8 +33,8 @@ jobs:
           docker run --rm --name configure-rpm -v /tmp/RPMS:/home/builder/rpmbuild/RPMS chipin/configure-rpm /usr/bin/rpmbuild -bb -D "CHIP_IN_RELEASE $RELEASE" -D "CHIP_IN_VERSION $VERSION" rpmbuild/SPECS/configure.spec
           (cd /tmp;tar -czf - RPMS) > $TRAVIS_BUILD_DIR/configure-rpm.tar.gz
       - name: Release
-        uses: softprops/action-gh-release@v0.1.5
+        uses: ncipollo/release-action@v1
         with:
-          files: configure-rpm.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: configure-rpm.tar.gz
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.VERSION }}
