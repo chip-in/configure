@@ -10,7 +10,6 @@ RUN yum -y install rpmdevtools make deltarpm rsync
 RUN yum -y install epel-release
 # work around for https://bugs.centos.org/view.php?id=13669&nbn=8
 RUN rpm -ivh https://kojipkgs.fedoraproject.org//packages/http-parser/2.7.1/3.el7/x86_64/http-parser-2.7.1-3.el7.x86_64.rpm
-RUN yum -y install nodejs npm
 ADD https://releases.hashicorp.com/consul/1.5.1/consul_1.5.1_linux_amd64.zip ${HOME}/rpmbuild/SOURCES/consul.zip
 ADD https://releases.hashicorp.com/consul-template/0.20.0/consul-template_0.20.0_linux_amd64.zip ${HOME}/rpmbuild/SOURCES/consul-template.zip
 COPY configure.spec ${HOME}/rpmbuild/SPECS/

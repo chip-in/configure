@@ -48,34 +48,38 @@
         <Handler type="Session" Location="/Session" showAttributeValues="false"/>
 
         <!-- JSON feed of discovery information. -->
-        <Handler type="DiscoveryFeed" Location="/DiscoFeed"/>        </Sessions>
-        <Errors supportContact="root@{{ executeTemplate "getFQDN"  }}" helpLocation="/about.html"
+        <Handler type="DiscoveryFeed" Location="/DiscoFeed"/>
+
+        <!-- Atrribute Resolver from SAML Attribute Provider -->
+        <Handler type="AttributeResolver"  Location="/AttributeResolver" />
+      </Sessions>
+      <Errors supportContact="root@{{ executeTemplate "getFQDN"  }}" helpLocation="/about.html"
             styleSheet="/shibboleth-sp/main.css"/>
 {{- range ls "metadatas" }}{{$metadata := .Value | parseJSON}}
   {{- if $metadata.url}}
-        <MetadataProvider type="XML" validate="false" url="{{$metadata.url}}" backingFilePath="{{.Key}}.xml" />
+      <MetadataProvider type="XML" validate="false" url="{{$metadata.url}}" backingFilePath="{{.Key}}.xml" />
   {{- else}}
-        <MetadataProvider type="XML" validate="false" path="metadata/{{.Key}}.xml" />
+      <MetadataProvider type="XML" validate="false" path="metadata/{{.Key}}.xml" />
   {{- end}}
 {{- end}}
-        <AttributeExtractor type="XML" validate="true" >
-          <am:Attributes>
-            <!-- <am:Attribute name="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" id="UID"> -->
-            <am:Attribute name="urn:oasis:names:tc:SAML:2.0:nameid-format:transient" id="UID">
-              <am:AttributeDecoder xsi:type="am:NameIDAttributeDecoder" formatter="$Name"/>
-            </am:Attribute>
+      <AttributeExtractor type="XML" validate="true" >
+        <am:Attributes>
+          <!-- <am:Attribute name="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" id="UID"> -->
+          <am:Attribute name="urn:oasis:names:tc:SAML:2.0:nameid-format:transient" id="UID">
+            <am:AttributeDecoder xsi:type="am:NameIDAttributeDecoder" formatter="$Name"/>
+          </am:Attribute>
 {{- range ls "attributes" }}{{$attribute := .Value | parseJSON}}
-            <am:Attribute name="{{$attribute.source}}" id="{{ .Key }}">
-              <am:AttributeDecoder xsi:type="am:{{$attribute.type}}"/>
-            </am:Attribute>
+          <am:Attribute name="{{$attribute.source}}" id="{{ .Key }}">
+            <am:AttributeDecoder xsi:type="am:{{$attribute.type}}"/>
+          </am:Attribute>
 {{- end}}
-          </am:Attributes>
-        </AttributeExtractor>
-        <AttributeResolver type="Query" subjectMatch="true"/>
-        <CredentialResolver type="File" use="signing"
-            key="sp-signing-key.pem" certificate="sp-signing-cert.pem"/>
-        <CredentialResolver type="File" use="encryption"
-            key="sp-encrypt-key.pem" certificate="sp-encrypt-cert.pem"/>
+        </am:Attributes>
+      </AttributeExtractor>
+      <AttributeResolver type="Query" subjectMatch="true"/>
+      <CredentialResolver type="File" use="signing"
+          key="sp-signing-key.pem" certificate="sp-signing-cert.pem"/>
+      <CredentialResolver type="File" use="encryption"
+          key="sp-encrypt-key.pem" certificate="sp-encrypt-cert.pem"/>
     </ApplicationDefaults>
     <SecurityPolicyProvider type="XML" validate="true" path="security-policy.xml"/>
     <ProtocolProvider type="XML" validate="true" reloadChanges="false" path="protocols.xml"/>
