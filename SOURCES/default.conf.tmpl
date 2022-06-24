@@ -7,8 +7,7 @@ log_format chip_in_core  '$time_iso8601($msec):conn=$connection,reqseq="$connect
 
 server {
   listen       80;
-  set_by_lua $core_fqdn 'return os.getenv("CORE_FQDN")';
-  server_name  $core_fqdn;
+  server_name  {{ env "CORE_FQDN" }};
   root   /usr/share/nginx/html;
   client_max_body_size 20m;
   client_header_buffer_size 64k;
@@ -38,10 +37,10 @@ server {
 
   location ~ /[ad]/ {
     include /etc/nginx/conf.d/*.conf.location;
-    proxy_pass http://localhost:3000;
+    proxy_pass http://127.0.0.1:3000;
     proxy_redirect ~^https?://([^/]+)(?::[0-9]+)?(/.*)$ https://$1:443$2;
     client_max_body_size 20m;
-    proxy_read_timeout 600;
+    proxy_read_timeout 630;
     proxy_http_version 1.1;
     proxy_set_header Connection "";
     proxy_set_header Host $host;
@@ -54,7 +53,7 @@ server {
 
   location /r {
     include /etc/nginx/conf.d/*.conf.location;
-    proxy_pass http://localhost:3000;
+    proxy_pass http://127.0.0.1:3000;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
@@ -67,7 +66,7 @@ server {
 
   location /m {
     include /etc/nginx/conf.d/*.conf.location;
-    proxy_pass http://localhost:1833;
+    proxy_pass http://127.0.0.1:1833;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
@@ -115,7 +114,7 @@ server {
 
   location /v1/ {
       include /etc/nginx/conf.d/*.conf.location;
-      proxy_pass http://localhost:8500;
+      proxy_pass http://127.0.0.1:8500;
       client_max_body_size 20m;
       proxy_http_version 1.1;
       proxy_set_header Connection "";
@@ -126,7 +125,7 @@ server {
       proxy_set_header X-Request-ID $request_id;
       proxy_read_timeout 300;
   }
-  
+
   location / {
       index  index.html index.htm;
   }

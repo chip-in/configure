@@ -1,6 +1,9 @@
 {{- if env "LOG_SERVER_URL" }}
 location /l/ {
-  proxy_pass {{ env "LOG_SERVER_URL" }};
+  set $log_server_url "{{ env "LOG_SERVER_URL" }}";
+  # CAUTION: following derective supports docker only
+  resolver 127.0.0.11 valid=10s;
+  proxy_pass $log_server_url;
   proxy_set_header X-Forwarded-for $remote_addr;
 }
 {{- end }}
