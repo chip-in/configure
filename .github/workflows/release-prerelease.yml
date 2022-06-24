@@ -27,7 +27,7 @@ jobs:
         env:
           WORK_DIR: ${{ github.workspace }}
         run: |
-          VERSION_ALL=$(node -e "var fs = require('fs');console.log(JSON.parse(fs.readFileSync('package.json').toString('utf-8')).version);")
+          VERSION_ALL=$(node -e "var fs = require('fs');console.log(JSON.parse(fs.readFileSync('composer.json').toString('utf-8')).version);")
           VERSION=${VERSION_ALL%%-*}
           RELEASE=0.${VERSION_ALL##*-}
           docker build -t chipin/configure-rpm .
