@@ -1,0 +1,46 @@
+name: release RC apps
+
+on:
+  push:
+    branches-ignore:
+      - '**'
+    # prerelease only
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc[a-f0-9]+.[0-9]+'
+
+jobs:
+  push_rc_to_github:
+    name: Release RC artifacts to github
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@kkuwa'
+
+      - name: bundle
+        env:
+          WORK_DIR: ${{ github.workspace }}
+        run: |
+          VERSION_ALL=$(node -e "var fs = require('fs');console.log(JSON.parse(fs.readFileSync('package.json').toString('utf-8')).version);")
+          VERSION=${VERSION_ALL%%-*}
+          RELEASE=0.${VERSION_ALL##*-}
+          docker build -t chipin/configure-rpm .
+          mkdir -p /tmp/RPMS/x86_64
+          sudo chown 111:111 -R /tmp/RPMS
+          docker run --rm --name configure-rpm -v /tmp/RPMS:/home/builder/rpmbuild/RPMS chipin/configure-rpm /usr/bin/rpmbuild -bb -D "CHIP_IN_RELEASE $RELEASE" -D "CHIP_IN_VERSION $VERSION" rpmbuild/SPECS/configure.spec
+          (cd /tmp;tar -czf - RPMS) > $WORK_DIR/configure-rpm.tar.gz
+
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: configure-rpm.tar.gz
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "${{ github.event.release.tag_name }}"
+          allowUpdates: true
+          prerelease: true
