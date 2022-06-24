@@ -34,4 +34,4 @@ jobs:
         run: |
           npm i -g release-it@${RELEASE_IT_VERSION}
           npm i -g @release-it/bumper@${BUMPER_VERSION}
-          release-it@${RELEASE_IT_VERSION} -- patch --ci
+          release-it -- patch --ci
