@@ -6,6 +6,10 @@
   "encode": {
     "alg": "HS256",
     "expSec": "{{ $jwt.expSec }}",
+    "expSecExt": {
+      "from": "header",
+      "var_name": "Shib-Session-Expires"
+    },
     "key": "{{ $jwt.sharedKey }}",
     "updateExpSec": "{{ $jwt.updateExpSec }}"
   },
