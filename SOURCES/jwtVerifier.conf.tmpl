@@ -6,8 +6,23 @@
 set $verifyconf "jwtVerifier.json";
 access_by_lua_file lua/jwtVerify.lua;
 set $query_token "";
-if ( $query_string ~ "(^|&)access_token=([^&]*)(&|$)") {
-  add_header Set-Cookie "access_token=$2;Path=/;{{- scratch.Get "secure" }}";
+if ($request_uri ~ "([^\?]*)\?access_token=([^&]*)$") {
+    set $original_path $1; 
+    set $token $2; 
+    set $args ""; 
+
+    add_header Set-Cookie "access_token=$token;Path=/;Secure;";
+    rewrite ^ "${original_path}" redirect;
+}
+if ($request_uri ~ "([^\?]*)\?(.*)access_token=([^&]*)&?(.*)") {
+    set $original_path $1; 
+    set $args1 $2; 
+    set $token $3; 
+    set $args2 $4; 
+    set $args ""; 
+
+    add_header Set-Cookie "access_token=$token;Path=/;Secure;";
+    rewrite ^ "${original_path}?${args1}${args2}" redirect;
 }
 set $nswg_jwt_sub "";
 log_by_lua_file lua/jwtVerifiedLogging.lua;

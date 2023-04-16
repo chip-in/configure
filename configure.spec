@@ -9,6 +9,8 @@ Source0: configure
 License:	MIT
 Requires:	nginx
 Requires:	mod_ssl
+Requires:	consul = 1.15.2
+Requires:   consul-template = 0.31.0
 
 %description
 
@@ -20,7 +22,7 @@ cp -a ${RPM_SOURCE_DIR}/* .
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/bin
-mkdir -p $RPM_BUILD_ROOT/usr/lib/systemd/system
+mkdir -p $RPM_BUILD_ROOT/usr/lib/systemd/system/consul.service.d
 mkdir -p $RPM_BUILD_ROOT/usr/lib/chip-in
 mkdir -p $RPM_BUILD_ROOT/etc/chip-in
 mkdir -p $RPM_BUILD_ROOT/var/consul
@@ -28,11 +30,9 @@ mkdir -p $RPM_BUILD_ROOT/etc/consul.d
 mkdir -p $RPM_BUILD_ROOT/etc/nginx/conf.d
 mkdir -p $RPM_BUILD_ROOT/etc/nginx/jwt.settings
 mkdir -p $RPM_BUILD_ROOT/etc/letsencrypt/renewal-hooks/post
-unzip consul.zip -d $RPM_BUILD_ROOT/usr/bin
-unzip consul-template -d $RPM_BUILD_ROOT/usr/bin
 install consul-env2conf.sh $RPM_BUILD_ROOT/usr/bin
-install consul.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install default.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
+install consul-override.conf $RPM_BUILD_ROOT/usr/lib/systemd/system/consul.service.d/override.conf
 install nginx-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install error.template.json $RPM_BUILD_ROOT/etc/nginx/jwt.settings
 install env2htpasswd.sh $RPM_BUILD_ROOT/usr/bin

@@ -1,5 +1,7 @@
-port 1833
+listener 1883
+listener 1833
 protocol websockets
+max_queued_messages 0
 {{- if keyOrDefault "useACL" "false" | parseBool }}
 auth_plugin /usr/local/chip-in/mosquitto/chipin_auth_plug.so
 {{- end}}
