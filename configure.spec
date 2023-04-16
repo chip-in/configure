@@ -32,7 +32,7 @@ mkdir -p $RPM_BUILD_ROOT/etc/nginx/jwt.settings
 mkdir -p $RPM_BUILD_ROOT/etc/letsencrypt/renewal-hooks/post
 install consul-env2conf.sh $RPM_BUILD_ROOT/usr/bin
 install default.conf.tmpl $RPM_BUILD_ROOT/usr/lib/chip-in
-install consul-override.conf $RPM_BUILD_ROOT/usr/lib/systemd/system/override.conf
+install consul-override.conf $RPM_BUILD_ROOT/usr/lib/systemd/system/consul.service.d/override.conf
 install nginx-config.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 install error.template.json $RPM_BUILD_ROOT/etc/nginx/jwt.settings
 install env2htpasswd.sh $RPM_BUILD_ROOT/usr/bin
